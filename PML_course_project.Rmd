@@ -4,15 +4,15 @@ author: "Yuliang Wang"
 date: "April 25, 2015"
 output: html_document
 ---
-###Synopsis###
+###Synopsis  
 Using devices such as Jawbone Up, Nike FuelBand, and Fitbit it is now possible to collect a large amount of data about personal activity relatively inexpensively. In this course project, the goal is to use data from accelerometers on the belt, forearm, arm, and dumbell of 6 participants. They were asked to perform barbell lifts correctly and incorrectly in 5 different ways.  
 I first downloaded the data, removed uninformative features, and then built a predictive model using Random Forest(RF). 
 Error rate were assesed using cross-validation and out-of-bag estimation inherent in RF. In both estimates, error rate is only 0.004. The most important variable in terms of contribution to predictive performance is "roll belt", followed by "yaw belt".  
 Finally, predictions for held-out test dataset is generated and submitted for grading and all predictions are correct.  
 
-###Analysis and Results###
+###Analysis and Results  
 
-####1. Download and pre-process data####  
+####1. Download and pre-process data   
 Training and testing data are downlownloaded from course website. Features with above 97% missing values are removed. Features that are too specific (user- or time-specific) are also removed.  
 ```{r}
 ##Download and read the data
@@ -33,7 +33,7 @@ pml_training<-pml_training[,-1]
 pml_training<-pml_training[,-grep("user|time|window",colnames(pml_training))]
 ```
 
-####2. Build predictive model ####  
+####2. Build predictive model    
 I selected Random Forest (RF) as the predictive method for this project as it is known to provide one of the best off the shelf predictive performance. I expected that the error rate should be very low using Random Forest for this problem. 5 repeats of 5-fold cross-validation is used to evaluate out-of-sample error. All variables from step 1 are used. Summary of results, in particular, the final model, is shown. We can see that the error rate is indeed very low for all 5 classes based on the confusion matrix. 
 ```{r,cache=TRUE}
 set.seed(1234)
@@ -50,7 +50,7 @@ rf_fit
 print(rf_fit$finalModel)
 ```
 
-####3. Cross-validation and out-of-bag (OOB) error estimate###
+####3. Cross-validation and out-of-bag (OOB) error estimate   
 5 repeats of 5-fold cross-validation is used to evaluate out-of-sample error. It is important to note that Random Forest also automatically generate out-of-bag error estimates because when building each tree, a bootstrap sample of the training data is used, and the remaining out-of-bag samples (approximately one-third) are classified using the resulting tree/forest. From the violin plot below, we can see that the two methods provide similar estimates of mean error rates. In both cases, the error rates is at 0.004.  
 ```{r,message=FALSE,warning=FALSE}
 library(vioplot)
@@ -61,7 +61,7 @@ vioplot(cv_error,oob_error,names=c("Cross-validation error","Out-of-bag error"))
 title("Violin plot of error rates based on cross validation and OOB")
 ```
   
-####4. Evaluate variable importance####  
+####4. Evaluate variable importance    
 In addition to high predictive performance, it is also important to understand what features contribute most to performance. This will help us understand the data and problem at hand. From the variable importance plot, we can see that the most important variable in terms of contribution to predictive performance is "roll belt", followed by "yaw belt".  
 
 ```{r,fig.height=6,message=FALSE,warning=FALSE}
@@ -69,7 +69,7 @@ library(randomForest)
 varImpPlot(rf_fit$finalModel,main="Variable importance plot",pch=20)
 ```
 
-####5. Predict testing data####  
+####5. Predict testing data    
 In this part, predictions for test data is generated.  
 ```{r}
 predicted<-predict(rf_fit,newdata=pml_testing)
